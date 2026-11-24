@@ -58,6 +58,7 @@ button { cursor: pointer; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 20px; margin: 40px 0 0; }
 .card { border: 1px solid var(--line); border-radius: 18px; padding: 28px 24px 22px; box-shadow: 0 10px 30px rgba(14,17,22,.05); }
 .card h2 { margin: 0; font: 600 20px/1.3 var(--sans); }
+.card h2 .plan { display: inline-block; margin-left: 8px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; font: 600 12px/1.5 var(--sans); color: var(--mute); vertical-align: 2px; }
 .card .en { margin: 4px 0 18px; font-size: 13px; color: var(--mute); min-height: 20px; }
 .file { border-top: 1px solid var(--line); padding: 16px 0 6px; }
 .file .name { font-size: 13px; color: var(--mute); word-break: break-all; margin: 0 0 10px; }
@@ -279,7 +280,9 @@ function start() {
   cards.textContent = "";
   for (const L of D.lessons) {
     const card = el("article", "card");
-    card.append(el("h2", "", L.lesson), el("p", "en", L.lesson_en || ""));
+    const h = el("h2", "", L.lesson);
+    if (L.plan) h.append(el("span", "plan", L.plan));
+    card.append(h, el("p", "en", L.lesson_en || ""));
     for (const f of L.files) {
       const box = el("div", "file"), btn = el("button", "btn" + (f.id === "v" ? " primary" : ""), `${f.kind} 받기 · ${size(f.size)}`);
       const ui = { bar: el("progress"), st: el("p", "st") };
