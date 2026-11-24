@@ -66,8 +66,6 @@ button { cursor: pointer; }
 .file .st { min-height: 22px; margin: 8px 0 0; font-size: 13px; color: var(--mute); }
 .file .st.ok { color: var(--ok); font-weight: 600; }
 .file .st.err { color: var(--fail); }
-.file details { margin: 6px 0 0; font-size: 12px; color: var(--mute); }
-.file details code { display: block; margin-top: 4px; font: 11px/1.5 Consolas, monospace; word-break: break-all; user-select: all; }
 .note { margin: 36px auto 0; max-width: 760px; font-size: 13px; color: var(--mute); }
 .note p { margin: 4px 0; }
 .note .warn { color: var(--fail); }
@@ -286,10 +284,8 @@ function start() {
       const box = el("div", "file"), btn = el("button", "btn" + (f.id === "v" ? " primary" : ""), `${f.kind} 받기 · ${size(f.size)}`);
       const ui = { bar: el("progress"), st: el("p", "st") };
       btn.type = "button"; ui.bar.hidden = true; ui.st.setAttribute("role", "status");
-      const det = el("details");
-      det.append(el("summary", "", "직접 확인하기 (SHA-256)"), el("code", "", f.sha256));
       btn.addEventListener("click", () => save(L, f, ui));
-      box.append(el("p", "name", f.name), btn, ui.bar, ui.st, det);
+      box.append(el("p", "name", f.name), btn, ui.bar, ui.st);
       card.append(box);
     }
     cards.append(card);
