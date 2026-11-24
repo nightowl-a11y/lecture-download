@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>AIEN 산출물 내려받기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap">
+<style>
+/* 강의 플레이어(web_player.html)와 같은 글꼴·색·버튼. 기여 표기는 make_download.py 가 넣음 (여기에 손으로 적지 않음) */
+@font-face { font-family: "A2Z"; font-weight: 400; src: local("에이투지체 4 Regular"), local("A2Z 4 Regular"); }
+@font-face { font-family: "A2Z"; font-weight: 600; src: local("에이투지체 6 SemiBold"), local("A2Z 6 SemiBold"); }
+@font-face { font-family: "A2Z"; font-weight: 700; src: local("에이투지체 7 Bold"), local("A2Z 7 Bold"); }
+@font-face { font-family: "Eulyoo"; font-weight: 400; src: local("을유1945"), local("Eulyoo1945"), local("Eulyoo1945-Regular"); }
+:root {
+  --ink: #0E1116; --paper: #FFFFFF; --mute: #6B7280; --faint: #C9CDD3; --line: #E4E6EA; --soft: #F4F5F7;
+  --blue: #0E4A84; --blue-2: #19558F; --blue-ink: #0A3C6D; --blue-soft: #E8F0F8; --fail: #B3261E; --ok: #1B6B3A;
+  --sans: "A2Z", "에이투지체", "Pretendard Variable", "Pretendard", "Malgun Gothic", sans-serif;
+  --serif: "Eulyoo", "을유1945", "Noto Serif KR", "Batang", serif;
+  --btn-face: linear-gradient(180deg, #FFFFFF 0%, #F3F4F6 100%); --btn-edge: #E1E4E8;
+  --btn-shadow: inset 0 1px 0 #FFFFFF, 0 2px 4px rgba(14,17,22,.07), 0 5px 10px -7px rgba(14,17,22,.12);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font: 15px/1.55 var(--sans); color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; }
+button, input { font-family: var(--sans); }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+.caps { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 22px; border-radius: 999px;
+       border: 1px solid var(--btn-edge); color: var(--ink); background: var(--btn-face); box-shadow: var(--btn-shadow);
+       font: 600 14px/1.4 var(--sans); transition: background .15s, box-shadow .15s, transform .1s; }
+.btn:hover { background: linear-gradient(180deg, #FFFFFF, #ECEEF1); box-shadow: inset 0 1px 0 #FFFFFF, 0 3px 7px rgba(14,17,22,.10); }
+.btn:active { transform: translateY(1px); background: #EEF0F3; box-shadow: inset 0 2px 3px rgba(14,17,22,.10), 0 1px 0 #FFFFFF; }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.btn.primary { color: #fff; border-color: var(--blue); background: linear-gradient(180deg, var(--blue-2), var(--blue)); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 2px 5px rgba(14,74,132,.16); }
+.btn.primary:hover { background: linear-gradient(180deg, #154D83, var(--blue-ink)); }
+
+/* 접속 코드 */
+.gate { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.gate form { width: min(420px, 100%); border: 1px solid var(--line); border-radius: 18px; padding: 36px 32px; box-shadow: 0 18px 50px rgba(14,17,22,.08); }
+.gate h1 { margin: 6px 0 26px; font: 400 30px/1.3 var(--serif); }
+.gate label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+.gate input { width: 100%; font-size: 17px; padding: 12px 16px; border: 1px solid var(--faint); border-radius: 999px; letter-spacing: .06em; }
+.gate input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.gate .btn { width: 100%; margin-top: 14px; }
+#msg { min-height: 22px; margin: 12px 0 0; font-size: 14px; color: var(--mute); }
+#msg.err { color: var(--fail); }
+
+/* 내려받기 — 가운데 정렬·전체 폭 */
+#app { min-height: 100vh; padding: 56px clamp(16px, 4vw, 64px) 72px; text-align: center; }
+.top h1 { margin: 8px 0 6px; font: 400 clamp(28px, 4vw, 40px)/1.25 var(--serif); }
+.top .course { margin: 0; color: var(--mute); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 20px; margin: 40px 0 0; }
+.card { border: 1px solid var(--line); border-radius: 18px; padding: 28px 24px 22px; box-shadow: 0 10px 30px rgba(14,17,22,.05); }
+.card h2 { margin: 0; font: 600 20px/1.3 var(--sans); }
+.card .en { margin: 4px 0 18px; font-size: 13px; color: var(--mute); min-height: 20px; }
+.file { border-top: 1px solid var(--line); padding: 16px 0 6px; }
+.file .name { font-size: 13px; color: var(--mute); word-break: break-all; margin: 0 0 10px; }
+.file .btn { width: 100%; }
+.file progress { width: 100%; height: 8px; margin: 12px 0 0; accent-color: var(--blue); }
+.file .st { min-height: 22px; margin: 8px 0 0; font-size: 13px; color: var(--mute); }
+.file .st.ok { color: var(--ok); font-weight: 600; }
+.file .st.err { color: var(--fail); }
+.file details { margin: 6px 0 0; font-size: 12px; color: var(--mute); }
+.file details code { display: block; margin-top: 4px; font: 11px/1.5 Consolas, monospace; word-break: break-all; user-select: all; }
+.note { margin: 36px auto 0; max-width: 760px; font-size: 13px; color: var(--mute); }
+.note p { margin: 4px 0; }
+.note .warn { color: var(--fail); }
+</style>
+</head>
+<body>
+<div class="gate" id="gate-wrap">
+  <form id="gate" autocomplete="off">
+    <div class="caps">2026 AI 혁신 과제 · 내부 검토용</div>
+    <h1>강의 현지화 도구<br>산출물 내려받기</h1>
+    <label for="code">접속 코드</label>
+    <input id="code" type="password" required autofocus>
+    <button class="btn primary" id="go" type="submit">열기</button>
+    <p id="msg" role="status"></p>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="caps">2026 AI 혁신 과제 · 내부 검토용</div>
+    <h1>산출물 내려받기</h1>
+    <p class="course" id="course"></p>
+  </header>
+  <main>
+    <div class="cards" id="cards"></div>
+    <section class="note">
+      <p id="how"></p>
+      <p>다 받으면 화면이 받은 파일을 원본과 비교합니다. <b>‘원본과 같음’</b>이 나오면 정상입니다.</p>
+      <p>받는 동안 이 창을 닫거나 새로고침하지 마세요. 받은 파일은 내부 검토용이며 다른 곳에 올리지 않습니다.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+const SALT = Uint8Array.from(atob("yu0bIJrDicslGx12PmpbQQ=="), c => c.charCodeAt(0));
+const ITER = 600000;
+const BIG = 64 * 1024 * 1024;          // 이보다 크면 (할 수 있는 브라우저에서는) 저장할 곳을 먼저 고르고 조각씩 씀
+const CAN_PICK = typeof window.showSaveFilePicker === "function";
+const $ = id => document.getElementById(id);
+let KEY = null, D = null, BUSY = false;
+
+/* ── 접속 코드 (강의 플레이어와 같은 방식) ── */
+async function keyFor(code) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt: SALT, iterations: ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+}
+async function unlock(code) {
+  KEY = await keyFor(code);
+  const r = await fetch("files/data.bin", { cache: "no-store" });
+  if (!r.ok) throw new Error("fetch data.bin");
+  const buf = new Uint8Array(await r.arrayBuffer());
+  try { D = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, KEY, buf.slice(12)))); }
+  catch (e) { if (e.name === "OperationError") return false; throw e; }
+  try { sessionStorage.setItem("aien-ld-code", code); } catch (e) {}
+  $("gate-wrap").hidden = true; $("app").hidden = false;
+  start();
+  return true;
+}
+async function run(code, quiet) {
+  $("go").disabled = true; $("msg").className = ""; $("msg").textContent = "확인 중…";
+  try {
+    if (await unlock(code)) return;
+    $("msg").className = "err"; $("msg").textContent = quiet ? "" : "접속 코드가 맞지 않습니다.";
+  } catch (e) { $("msg").className = "err"; $("msg").textContent = "자료를 불러오지 못했습니다. 새로고침해 주세요."; }
+  $("go").disabled = false; $("code").select();
+}
+$("gate").addEventListener("submit", e => { e.preventDefault(); run($("code").value.trim(), false); });
+let saved = null;
+try { saved = sessionStorage.getItem("aien-ld-code"); } catch (e) {}
+if (saved) run(saved, true);
+
+/* ── SHA-256 을 조각씩 이어서 계산 (브라우저 기본 기능은 통째로만 계산해서 큰 파일에 못 씀) ── */
+const SHA_K = (() => {
+  const k = new Int32Array(64);
+  for (let n = 2, i = 0; i < 64; n++) {
+    let prime = true;
+    for (let d = 2; d * d <= n; d++) if (n % d === 0) { prime = false; break; }
+    if (prime) { const c = Math.cbrt(n); k[i++] = ((c - Math.floor(c)) * 4294967296) | 0; }
+  }
+  return k;
+})();
+class Sha256 {
+  constructor() {
+    this.h = new Int32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+    this.buf = new Uint8Array(64); this.n = 0; this.len = 0; this.w = new Int32Array(64);
+  }
+  block(d, o) {
+    const w = this.w, h = this.h, K = SHA_K;
+    for (let i = 0; i < 16; i++, o += 4) w[i] = (d[o] << 24) | (d[o + 1] << 16) | (d[o + 2] << 8) | d[o + 3];
+    for (let i = 16; i < 64; i++) {
+      const a = w[i - 15], b = w[i - 2];
+      w[i] = (w[i - 16] + (((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3)) + w[i - 7] + (((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10))) | 0;
+    }
+    let a = h[0], b = h[1], c = h[2], e0 = h[3], e = h[4], f = h[5], g = h[6], x = h[7];
+    for (let i = 0; i < 64; i++) {
+      const t1 = (x + (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      x = g; g = f; f = e; e = (e0 + t1) | 0; e0 = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h[0] += a; h[1] += b; h[2] += c; h[3] += e0; h[4] += e; h[5] += f; h[6] += g; h[7] += x;
+  }
+  update(d) {
+    let p = 0; const L = d.length; this.len += L;
+    if (this.n) {
+      while (p < L && this.n < 64) this.buf[this.n++] = d[p++];
+      if (this.n === 64) { this.block(this.buf, 0); this.n = 0; }
+    }
+    for (; p + 64 <= L; p += 64) this.block(d, p);
+    while (p < L) this.buf[this.n++] = d[p++];
+  }
+  hex() {
+    const tail = new Uint8Array(this.n < 56 ? 64 : 128);
+    tail.set(this.buf.subarray(0, this.n)); tail[this.n] = 0x80;
+    const v = new DataView(tail.buffer);
+    v.setUint32(tail.length - 8, Math.floor(this.len / 0x20000000));
+    v.setUint32(tail.length - 4, (this.len % 0x20000000) * 8);
+    for (let o = 0; o < tail.length; o += 64) this.block(tail, o);
+    return Array.from(this.h, x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+  }
+}
+
+/* ── 조각을 받아 풀고, 저장할 곳(sink)에 차례로 씀. 다 쓴 뒤 크기·SHA-256 이 원본과 같아야 끝 ── */
+const fromHex = s => Uint8Array.from(s.match(/../g), x => parseInt(x, 16));
+const size = n => n >= 1048576 ? Math.round(n / 1048576).toLocaleString() + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function getChunk(url) {
+  let last;
+  for (let t = 0; t < 4; t++) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return new Uint8Array(await r.arrayBuffer());
+    } catch (e) { last = e; await wait(1500 * (t + 1)); }
+  }
+  throw last;
+}
+async function pull(L, f, sink, onProg) {
+  const key = await crypto.subtle.importKey("raw", fromHex(L.key), "AES-GCM", false, ["decrypt"]);
+  const sha = new Sha256();
+  let done = 0;
+  for (let i = 0; i < f.n; i++) {
+    const buf = await getChunk(`../${L.repo}/c/${f.id}${String(i).padStart(3, "0")}.bin?t=${L.stamp}`);
+    const aad = new TextEncoder().encode(`${L.code}/${f.id}/${i}/${f.n}`);
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.subarray(0, 12), additionalData: aad }, key, buf.subarray(12)));
+    sha.update(plain);
+    await sink.write(plain);
+    done += plain.length;
+    onProg(i + 1, done);
+    await wait(0);
+  }
+  const hex = sha.hex();
+  if (done !== f.size || hex !== f.sha256) { const e = new Error("받은 파일이 원본과 다름"); e.name = "MismatchError"; throw e; }
+  return hex;
+}
+async function pickSink(f) {
+  const ext = "." + f.name.split(".").pop();
+  const handle = await window.showSaveFilePicker({ suggestedName: f.name, types: [{ description: f.kind, accept: { [f.mime]: [ext] } }] });
+  const w = await handle.createWritable();
+  return { how: "pick", write: b => w.write(b), close: () => w.close(), abort: () => w.abort().catch(() => {}) };
+}
+function blobSink(f) {
+  const parts = [];
+  return {
+    how: "blob", write: async b => { parts.push(new Blob([b])); }, abort: async () => { parts.length = 0; },
+    close: async () => {
+      const url = URL.createObjectURL(new Blob(parts, { type: f.mime }));
+      const a = document.createElement("a");
+      a.href = url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 180000);
+    }
+  };
+}
+
+async function save(L, f, ui) {
+  if (BUSY) return;
+  BUSY = true;
+  let sink = null;
+  const say = (text, cls) => { ui.st.className = "st" + (cls ? " " + cls : ""); ui.st.textContent = text; };
+  try {
+    if (CAN_PICK && f.size > BIG) {
+      try { sink = await pickSink(f); }
+      catch (e) { if (e.name === "AbortError") return; sink = null; }
+    }
+    if (!sink) sink = blobSink(f);
+    document.querySelectorAll(".file .btn").forEach(b => b.disabled = true);
+    ui.bar.hidden = false; ui.bar.max = f.size || 1; ui.bar.value = 0;
+    say("받는 중… 0 / " + size(f.size));
+    await pull(L, f, sink, (i, done) => { ui.bar.value = done; say(`받는 중… ${size(done)} / ${size(f.size)} (조각 ${i}/${f.n})`); });
+    say("저장하는 중…");
+    await sink.close();
+    say(sink.how === "pick" ? `✓ 저장 완료 · 원본과 같음 (${size(f.size)})` : `✓ 원본과 같음 (${size(f.size)}) · 브라우저의 내려받기 폴더에 저장됩니다`, "ok");
+  } catch (e) {
+    if (sink) await sink.abort();
+    say(e.name === "MismatchError" || e.name === "OperationError" ?"받은 파일이 원본과 달라 저장하지 않았습니다. 새로고침한 뒤 다시 받아 주세요."
+                                   : "받지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.", "err");
+  } finally {
+    BUSY = false;
+    document.querySelectorAll(".file .btn").forEach(b => b.disabled = false);
+  }
+}
+addEventListener("beforeunload", e => { if (BUSY) { e.preventDefault(); e.returnValue = ""; } });
+
+function el(tag, cls, text) { const x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; }
+function start() {
+  $("course").textContent = `${D.course_ko} · ${D.course_en}`;
+  $("how").textContent = CAN_PICK
+    ? "영상은 ‘받기’를 누르면 저장할 곳을 먼저 고르고, 조각씩 받아 바로 저장합니다."
+    : "이 브라우저는 영상을 메모리에 모았다가 저장해서 느리거나 실패할 수 있습니다. PC의 Chrome·Edge 에서 받기를 권합니다.";
+  if (!CAN_PICK) $("how").className = "warn";
+  const cards = $("cards");
+  cards.textContent = "";
+  for (const L of D.lessons) {
+    const card = el("article", "card");
+    card.append(el("h2", "", L.lesson), el("p", "en", L.lesson_en || ""));
+    for (const f of L.files) {
+      const box = el("div", "file"), btn = el("button", "btn" + (f.id === "v" ? " primary" : ""), `${f.kind} 받기 · ${size(f.size)}`);
+      const ui = { bar: el("progress"), st: el("p", "st") };
+      btn.type = "button"; ui.bar.hidden = true; ui.st.setAttribute("role", "status");
+      const det = el("details");
+      det.append(el("summary", "", "직접 확인하기 (SHA-256)"), el("code", "", f.sha256));
+      btn.addEventListener("click", () => save(L, f, ui));
+      box.append(el("p", "name", f.name), btn, ui.bar, ui.st, det);
+      card.append(box);
+    }
+    cards.append(card);
+  }
+  if (!D.lessons.length) cards.append(el("p", "", "아직 올라온 산출물이 없습니다."));
+}
+</script>
+<div id="aien-credit" aria-hidden="true" style="position:fixed!important;right:8px!important;bottom:3px!important;z-index:2147483647!important;display:block!important;visibility:visible!important;font:300 10px/1 sans-serif!important;color:#000!important;opacity:.13!important;pointer-events:none!important;user-select:none!important;white-space:nowrap!important">제작: 에듀테크혁신팀 고유진</div>
+</body>
+</html>
